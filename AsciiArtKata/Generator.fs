@@ -15,16 +15,16 @@ let typography =
 let lines = typography.Split([|'\r'; '\n'|], StringSplitOptions.RemoveEmptyEntries)
 
 // step 1: compute max line length
-let maxlineLength = 0
+let maxlineLength = lines |> Seq.map (fun l -> l.Length) |> Seq.max
 
 // step 2: check if a line with different length exists
-let linesContainsErrorOfLength = true
+let linesContainsErrorOfLength = lines |> Seq.exists (fun l -> l.Length <> maxlineLength)
 
 // step 3: find all spaces columns offsets between letters
 let letters = 
   seq {
     for i in 0 .. maxlineLength-1 do
-      let isSpace = true //TODO: fix this line
+      let isSpace = lines |> Seq.exists(fun l -> l.[i] <> ' ') |> not
       if isSpace then yield i
   } |> Seq.toList
 
@@ -55,15 +55,25 @@ let accumulateCoordinates state (letter:char, index:int) =
   { state with Items=items; CurrentOffset=index }
 
 let computeCoordinates() : LetterCoordinatesMap =
-  let indexedLetters : (char*int) list = [] // letters |> List.map2 ... alphabet
-  // build LetterCoordinatesMap with List.fold and dict
-  failwith "Not implemented"
+  let indexedLetters =
+    letters
+    |> List.map2 (fun k v -> k,v) alphabet
+  indexedLetters
+  |>List.fold accumulateCoordinates CoordinatesComputationState.Empty
+  |> fun state -> dict state.Items
 
 
 // step 5: build an optionnal
 
 let getLetter (c:char) (coordinates:LetterCoordinatesMap) : LetterContent option =
-  failwith "Not implemented"
+  if coordinates.ContainsKey c
+  then
+    let letterCoordinates = coordinates.Item c
+    lines
+    |> Seq.map(fun l -> l.Substring(letterCoordinates.From, letterCoordinates.Length))
+    |> Seq.toList
+    |> Some
+  else None
 
 // Try:
 // ------------------
@@ -89,9 +99,11 @@ let drawLetters (letters:LetterContent list) =
 
 // step 7: use Seq.choose to draw found letters
 let drawString coordinates (text:string) =
-  let findLetter = getLetter >> coordinates
-  text.ToLower().ToCharArray() // ... finish this line
-  failwith "Not implemented"
+  let findLetter c = coordinates |> getLetter c
+  text.ToLower().ToCharArray() 
+  |> Seq.choose findLetter 
+  |> Seq.toList
+  |> drawLetters
 
 // Try
 // ------------------
@@ -101,8 +113,8 @@ let drawString coordinates (text:string) =
 
 // step 8: Calculate the average width of the letters
 let getAvgLetterSize (coordinates:LetterCoordinatesMap) =
-  failwith "Not implemented"
-  0
+  coordinates.Values |> Seq.averageBy (fun v -> float v.Length) |> int
+
 
 // ------------------
 let createSpace width height = 
@@ -114,10 +126,20 @@ let createSpace width height =
 
 // step 9: drawString' must display a space whose size corresponds to the average size of the characters when it finds an unknown letter
 let drawString' (coordinates:LetterCoordinatesMap) (text:string) =
-  failwith "Not implemented"
+  let findLetter c = coordinates |> getLetter c
+  seq {
+    for letter in text.ToLower().ToCharArray() do
+      match findLetter letter with
+      | Some content -> yield content
+      | None -> 
+        let avgLetterSize = getAvgLetterSize coordinates
+        yield createSpace avgLetterSize lines.Length
+  }
+  |> Seq.toList
+  |> drawLetters
 
 // Try
 // ------------------
 //let coordinates = computeCoordinates()
-//drawString' "Fsharp is cool"
+//drawString' coordinates "Fsharp is cool"
 // ------------------
