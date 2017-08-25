@@ -68,6 +68,7 @@ Target "Watch" (fun _ ->
 
 Target "RestorePackages" (fun _ ->
     RestorePackages()
+    Fake.DotNetCli.Restore (fun p -> {p with NoCache=true})
 )
 
 Target "Clean" (fun _ ->
