@@ -1,8 +1,4 @@
-#r "../packages/System.Console/lib/net46/System.Console.dll"
-#I "../packages/Expecto/lib/net461"
-#r "Expecto.dll"
-
-#load "../AsciiArtKata/Generator.fs"
+module AsciiArtKata.Tests
 
 open Expecto
 open Generator
@@ -13,7 +9,8 @@ let liveTests =
     test "When computing max line length" {
       Expect.equal maxlineLength 229 "then result should be 229"
     }
-        
+    
+
     test "When checking if lines contains error of length" {
       Expect.equal linesContainsErrorOfLength false "linesContainsErrorOfLength should be false"
     }
@@ -30,7 +27,7 @@ let liveTests =
         let message = sprintf "letter '%c' should be mapped" c
         Expect.isTrue (coordinates.ContainsKey c) message
     }
-
+    
     test "When getting coordinates of letters" {
       let coordinates = computeCoordinates()
       
@@ -50,3 +47,9 @@ let liveTests =
 
 runTests defaultConfig liveTests
 
+#if !INTERACTIVE
+
+printfn "Press any key to quit ..."
+System.Console.ReadKey true
+
+#endif
