@@ -1,6 +1,8 @@
 # AsciiArtKataFsharp
 Ascii Art kata Fsharp
 
+![ascii_2](images/ascii_1.png)
+
 ## Build project
 
 > Run `build.cmd` or `build.sh`
