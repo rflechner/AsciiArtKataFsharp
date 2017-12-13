@@ -1,5 +1,6 @@
 source https://www.nuget.org/api/v2
 nuget expecto
+nuget Microsoft.NETCore.Platforms >= 2.0.0
 
 group build
     source https://www.nuget.org/api/v2

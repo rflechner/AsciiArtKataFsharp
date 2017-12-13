@@ -4,12 +4,11 @@ open Expecto
 open Generator
 
 let liveTests =
-  testList "Transforming typography in blocks" [
+  testSequenced <| testList "Transforming typography in blocks" [
     
     test "When computing max line length" {
       Expect.equal maxlineLength 229 "then result should be 229"
     }
-    
 
     test "When checking if lines contains error of length" {
       Expect.equal linesContainsErrorOfLength false "linesContainsErrorOfLength should be false"
@@ -30,17 +29,17 @@ let liveTests =
     
     test "When getting coordinates of letters" {
       let coordinates = computeCoordinates()
-      
-      let letterA = coordinates |> getLetter 'a'
+
+      let letterA = 'a' |> getLetter coordinates
       Expect.isSome letterA "then 'a' should be found in typography"
 
-      let underscore = coordinates |> getLetter '_'
-      Expect.isNone underscore "then '_' should be found in typography"
+      let underscore = '_' |> getLetter coordinates
+      Expect.isNone underscore "then '_' should not be found in typography"
     }
 
     test "When computing the average width of the letters" {
       let avg = computeCoordinates() |> getAvgLetterSize
-      Expect.equal avg 8 "then it should be 8"
+      Expect.floatClose Accuracy.veryHigh avg 8.769230769 "then it should be 8"
     }
 
   ]
