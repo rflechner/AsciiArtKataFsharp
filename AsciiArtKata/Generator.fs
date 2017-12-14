@@ -43,12 +43,12 @@ type CoordinatesComputationState =
   static member Empty = 
     { CurrentOffset=0; Items=[] }
 
-type LetterContent = string list
 type LetterCoordinatesMap = System.Collections.Generic.IDictionary<char, LetterCoordinates>
 
 // ------------------
 
-// step 4: use map2 then fold, then dict
+// step 4: Associate each alphabet letter to his coordinates
+// Tips: use map2 then fold, then dict
 
 let accumulateCoordinates state (letter:char, index:int) =
   let items = (letter,{ From=state.CurrentOffset; To=index }) :: state.Items
@@ -60,24 +60,12 @@ let computeCoordinates() : LetterCoordinatesMap =
   failwith "Not implemented"
 
 
-// step 5: build an optionnal
+// step 5: Extract letter content (if it was found)
 
-let getLetter (c:char) (coordinates:LetterCoordinatesMap) : LetterContent option =
+type LetterContent = string list
+
+let getLetter (coordinates:LetterCoordinatesMap) (c:char) : LetterContent option =
   failwith "Not implemented"
-
-// Try:
-// ------------------
-
-// computeCoordinates() |> getLetter 'a'
-// val it : string list option =
-//   Some
-//     ["     ___ "; "    /   |"; "   / /| |"; "  / /_| |"; " /  __  |";
-//      "/_/   |_|"]
-
-// computeCoordinates() |> getLetter '_'
-// val it : string list option = None
-
-// ------------------
 
 // step 6: draw a letter
 
@@ -87,7 +75,8 @@ let drawLetters (letters:LetterContent list) =
       printf "%s" letter.[i]
     printfn ""
 
-// step 7: use Seq.choose to draw found letters
+// step 7: Draw text
+// Tips: use Seq.choose to draw found letters
 let drawString coordinates (text:string) =
   let findLetter = getLetter >> coordinates
   text.ToLower().ToCharArray() // ... finish this line
@@ -96,13 +85,12 @@ let drawString coordinates (text:string) =
 // Try
 // ------------------
 // let coordinates = computeCoordinates()
-// drawString "Fsharp"
+// drawString coordinates "Fsharp"
 // ------------------
 
 // step 8: Calculate the average width of the letters
-let getAvgLetterSize (coordinates:LetterCoordinatesMap) =
+let getAvgLetterSize (coordinates:LetterCoordinatesMap) : float =
   failwith "Not implemented"
-  0
 
 // ------------------
 let createSpace width height = 
@@ -119,5 +107,5 @@ let drawString' (coordinates:LetterCoordinatesMap) (text:string) =
 // Try
 // ------------------
 //let coordinates = computeCoordinates()
-//drawString' "Fsharp is cool"
+//drawString' coordinates "Fsharp is cool"
 // ------------------
